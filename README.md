@@ -9,8 +9,9 @@ Vultr Dedicated Cloud\
 
 * Disable IPv6
 * Add Firewall Group, ensure server connected to this group
-  * Accept HTTPs (Anywhere)
-  * Accept SSH (Custom, IPs as needed)
+  * Accept HTTP (anywhere)
+  * Accept HTTPS (anywhere)
+  * Accept SSH (custom, IPs as needed)
   * Drop any (all ports) 
 
 # Render Configuration
@@ -23,6 +24,7 @@ Based on: https://gist.github.com/nd3w/8017f2e0b8afb44188e733d2ec487deb
 
 ```
 $ apt install nginx
+$ ufw allow http
 $ ufw allow https
 ```
 
