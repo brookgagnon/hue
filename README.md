@@ -14,8 +14,6 @@ Vultr Dedicated Cloud\
   * Accept SSH (custom, IPs as needed)
   * Drop any (all ports) 
 
-# Render Configuration
-
 # Server Initialization
 
 Based on: https://gist.github.com/nd3w/8017f2e0b8afb44188e733d2ec487deb
@@ -42,3 +40,5 @@ Disallow root login remotely? [Y/n] y
 Remove test database and access to it? [Y/n] y
 Reload privilege tables now? [Y/n] y
 ```
+
+# Render Configuration
