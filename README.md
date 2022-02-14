@@ -1,11 +1,11 @@
-# Render Configuration
-
 # Current Specs
 
 Vultr Dedicated Cloud\
 120GB SSD\
 2 vCPU\
 8 GB Memory
+
+# Render Configuration
 
 # Server Initialization
 
