@@ -5,6 +5,14 @@ Vultr Dedicated Cloud\
 2 vCPU\
 8 GB Memory
 
+# Vultr Configuration
+
+* Disable IPv6
+* Add Firewall Group, ensure server connected to this group
+  * Accept HTTPs (Anywhere)
+  * Accept SSH (Custom, IPs as needed)
+  * Drop any (all ports) 
+
 # Render Configuration
 
 # Server Initialization
