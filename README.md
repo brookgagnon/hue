@@ -62,6 +62,6 @@ This installation provided adequate protection using try_files in /etc/nginx/sni
 try_files $fastcgi_script_name =404;
 ```
 
-TODO: Test this.
+**TODO: Test this.**
 
 # Render Configuration
