@@ -16,11 +16,12 @@ Vultr Dedicated Cloud\
 
 # Server Initialization
 
-Based on: https://gist.github.com/nd3w/8017f2e0b8afb44188e733d2ec487deb
-
 ## Nginx
 
 ```
+$ add-apt-repository ppa:ondrej/nginx
+$ apt update
+$ apt upgrade
 $ apt install nginx
 $ ufw allow http
 $ ufw allow https
@@ -40,5 +41,15 @@ Disallow root login remotely? [Y/n] y
 Remove test database and access to it? [Y/n] y
 Reload privilege tables now? [Y/n] y
 ```
+
+## PHP 8.0
+
+```
+$ add-apt-repository ppa:ondrej/php
+$ apt update
+$ apt upgrade
+$ apt install php8.0 php8.0-fpm php8.0-curl php8.0-gd php8.0-mbstring php8.0-mysql php8.0-xml php8.0-imagick php8.0-zip php8.0-bcmath php8.0-intl
+```
+
 
 # Render Configuration
