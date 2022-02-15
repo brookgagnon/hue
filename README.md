@@ -8,6 +8,7 @@ Vultr Dedicated Cloud\
 # Vultr Configuration
 
 * Disable IPv6
+* Enable DDOS Protection
 * Add Firewall Group, ensure server connected to this group
   * Accept HTTP (anywhere)
   * Accept HTTPS (anywhere)
