@@ -65,3 +65,27 @@ try_files $fastcgi_script_name =404;
 **TODO: Test this.**
 
 # Render Configuration
+
+
+# Hue Tools
+
+## Introduction
+
+Hue tools are a set of helper scripts for user management based on this server configuration.
+
+## Installation
+
+1. Add /root/bin to path by appending the following to /root/.profile:
+
+```
+PATH="$HOME/bin:$PATH"
+```
+
+2. Clone hue repository and create symlinks to hue bin scripts.
+
+```
+git clone https://github.com/brookgagnon/hue.git /root/hue
+mkdir /root/bin
+ln -s /root/hue/bin/hue-adduser /root/bin
+```
+
