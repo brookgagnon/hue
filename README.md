@@ -17,13 +17,19 @@ Vultr Dedicated Cloud\
 
 # Server Initialization
 
-## Automatic Updates
+## Initial Configuration
 
 Enable reboot after automatic updates, if necessary, by editing /etc/apt/apt.conf.d/50unattended-upgrades:
 
 ```
 Unattended-Upgrade::Automatic-Reboot "true";
 Unattended-Upgrade::Automatic-Reboot-Time "12:00";
+```
+
+Disable password authentication for SSH by editing /etc/ssh/sshd_config:
+
+```
+PasswordAuthentication no
 ```
 
 Adjust the reboot time as needed. The server will likely be in UTC by default.
@@ -37,6 +43,7 @@ $ apt upgrade
 $ apt install nginx
 $ ufw allow http
 $ ufw allow https
+$ snap install --classic certbot
 ```
 
 ## MariaDB
