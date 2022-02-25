@@ -26,13 +26,13 @@ Unattended-Upgrade::Automatic-Reboot "true";
 Unattended-Upgrade::Automatic-Reboot-Time "12:00";
 ```
 
+Adjust the reboot time as needed. The server will likely be in UTC by default.
+
 Disable password authentication for SSH by editing /etc/ssh/sshd_config:
 
 ```
 PasswordAuthentication no
 ```
-
-Adjust the reboot time as needed. The server will likely be in UTC by default.
 
 ## Nginx
 
