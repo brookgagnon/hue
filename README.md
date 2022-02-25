@@ -102,8 +102,14 @@ PATH="$HOME/bin:$PATH"
 2. Clone hue repository and create symlinks to hue bin scripts.
 
 ```
-git clone https://github.com/brookgagnon/hue.git /root/hue
-mkdir /root/bin
-ln -s /root/hue/bin/hue-adduser /root/bin
+$ git clone https://github.com/brookgagnon/hue.git /root/hue
+$ mkdir /root/bin
+$ ln -s /root/hue/bin/hue-useradd /root/bin
+```
+
+3. Run the hue install tool to create the hue database and tables.
+
+```
+$ /root/hue/bin/hue-install
 ```
 
