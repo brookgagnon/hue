@@ -1,0 +1,67 @@
+#!/usr/bin/php
+<?php
+
+$driver = new mysqli_driver();
+$driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+
+$db = new mysqli('localhost','root');
+
+$result = $db->query('SHOW DATABASES LIKE \'hue\'');
+
+if($result->num_rows>0)
+{
+  echo 'Database "hue" already exists.'.PHP_EOL;
+  exit(1);
+}
+
+try
+{
+  $db->query('CREATE DATABASE hue');
+  $db->select_db('hue');
+
+  $db->query('
+    CREATE TABLE `sites` (
+      `id` int(10) UNSIGNED NOT NULL,
+      `username` varchar(16) NOT NULL,
+      `name` varchar(32) NOT NULL,
+      `https` tinyint(1) NOT NULL,
+      `htpasswd` tinyint(1) NOT NULL,
+      `fqdns` varchar(255) NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=ascii;
+  ');
+
+  $db->query('
+    CREATE TABLE `users` (
+      `username` varchar(16) NOT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=ascii;
+  ');
+
+  $db->query('
+    ALTER TABLE `sites`
+      ADD PRIMARY KEY (`id`),
+      ADD KEY `username` (`username`);
+  ');
+
+  $db->query('
+    ALTER TABLE `users`
+      ADD PRIMARY KEY (`username`);
+  ');
+
+  $db->query('
+    ALTER TABLE `sites`
+      MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+  ');
+
+  $db->query('
+    ALTER TABLE `sites`
+      ADD CONSTRAINT `sites_ibfk_1` FOREIGN KEY (`username`) REFERENCES `users` (`username`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ');
+}
+catch (mysqli_sql_exception $e)
+{
+  $db->query('DROP DATABASE hue');
+  echo $e.PHP_EOL;
+  exit(1);
+}
+
+echo 'Installation complete.'.PHP_EOL;

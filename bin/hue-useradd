@@ -1,0 +1,60 @@
+#!/usr/bin/php
+<?php
+
+$driver = new mysqli_driver();
+$driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+
+$db = new mysqli('localhost','root','','hue');
+
+// ask for username and validate
+do
+{
+  $username = readline('Username: ');
+  if(preg_match('/[^a-z0-9]/',$username))
+  {
+    echo 'Invalid username.'.PHP_EOL;
+    $username = false;
+  }
+} while(!$username);
+
+// see if user exists
+$query = $db->prepare('SELECT * FROM users WHERE username = ?');
+$query->bind_param('s', $username);
+$query->execute();
+if($query->fetch())
+{
+  echo 'User already exists.'.PHP_EOL;
+  exit(1);
+}
+
+try
+{
+  // add username to users table
+  $query = $db->prepare('INSERT INTO users SET username = ?');
+  $query->bind_param('s', $username);
+  $query->execute();
+
+  // create random sql password
+  $keyspace = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890';
+  $sqlpass = '';
+  while(strlen($sqlpass)<16) $sqlpass = $sqlpass.$keyspace[random_int(0, strlen($keyspace)-1)];
+
+  // add sql user and permissions
+  $db->query('CREATE USER '.$username.'@localhost IDENTIFIED BY \''.$sqlpass.'\'');
+  $db->query('GRANT ALL PRIVILEGES ON `'.$username.'\_%`.* TO '.$username.'@localhost');
+  $db->query('FLUSH PRIVILEGES');
+
+  // add system user
+  $result_code = null;
+  passthru('useradd -m '.escapeshellarg($username), $result_code);
+  if($result_code!==0) throw new Exception('Error encountered creating account with useradd command.');
+}
+catch (Exception | mysqli_sql_exception $e)
+{
+  echo $e.PHP_EOL;
+  exit(1);
+}
+
+echo 'User "'.$username.'" added.'.PHP_EOL;
+echo 'SQL Username: '.$username.PHP_EOL;
+echo 'SQL Password: '.$sqlpass.PHP_EOL;
