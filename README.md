@@ -17,6 +17,23 @@ Vultr Dedicated Cloud\
 
 # Server Initialization
 
+## Initial Configuration
+
+Enable reboot after automatic updates, if necessary, by editing /etc/apt/apt.conf.d/50unattended-upgrades:
+
+```
+Unattended-Upgrade::Automatic-Reboot "true";
+Unattended-Upgrade::Automatic-Reboot-Time "12:00";
+```
+
+Adjust the reboot time as needed. The server will likely be in UTC by default.
+
+Disable password authentication for SSH by editing /etc/ssh/sshd_config:
+
+```
+PasswordAuthentication no
+```
+
 ## Nginx
 
 ```
@@ -26,6 +43,7 @@ $ apt upgrade
 $ apt install nginx
 $ ufw allow http
 $ ufw allow https
+$ snap install --classic certbot
 ```
 
 ## MariaDB
@@ -65,3 +83,33 @@ try_files $fastcgi_script_name =404;
 **TODO: Test this.**
 
 # Render Configuration
+
+
+# Hue Tools
+
+## Introduction
+
+Hue tools are a set of helper scripts for user management based on this server configuration.
+
+## Installation
+
+1. Add /root/bin to path by appending the following to /root/.profile:
+
+```
+PATH="$HOME/bin:$PATH"
+```
+
+2. Clone hue repository and create symlinks to hue bin scripts.
+
+```
+$ git clone https://github.com/brookgagnon/hue.git /root/hue
+$ mkdir /root/bin
+$ ln -s /root/hue/bin/hue-useradd /root/bin
+```
+
+3. Run the hue install tool to create the hue database and tables.
+
+```
+$ /root/hue/bin/hue-install
+```
+
