@@ -1,0 +1,47 @@
+#!/usr/bin/php
+<?php
+
+$driver = new mysqli_driver();
+$driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+
+$db = new mysqli('localhost','root','','hue');
+
+// ask for username and validate
+$username = readline('Username: ');
+
+// see if user exists
+$result = $db->query("SELECT * FROM users WHERE username = '{$db->real_escape_string($username)}'");
+if(!$result->num_rows)
+{
+  echo 'User doesn\'t seem to exist.'.PHP_EOL;
+  exit(1);
+}
+
+echo PHP_EOL.'This will delete the system user, database user, home directory, and databases.'.PHP_EOL.'Are you sure you want to do this?'.PHP_EOL.PHP_EOL;
+$confirm = readline('Type the username again to confirm: ');
+if($confirm!=$username)
+{
+  echo 'Username does not match. Please try again.'.PHP_EOL;
+  exit(1);
+}
+
+try
+{
+  // remove sql user
+  $db->query("DROP USER $username@localhost");
+
+  // remove system user
+  $result_code = null;
+  passthru("userdel -r $username", $result_code);
+  if($result_code!==0) throw new Exception('Error removing account with userdel command.');
+
+  // add username from users table
+  $db->query("DELETE FROM users WHERE username = '$username'");
+}
+catch (Exception | mysqli_sql_exception $e)
+{
+  echo $e.PHP_EOL;
+  exit(1);
+}
+
+echo PHP_EOL.'User "'.$username.'" deleted.'.PHP_EOL;

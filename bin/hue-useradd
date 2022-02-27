@@ -18,10 +18,8 @@ do
 } while(!$username);
 
 // see if user exists
-$query = $db->prepare('SELECT * FROM users WHERE username = ?');
-$query->bind_param('s', $username);
-$query->execute();
-if($query->fetch())
+$result = $db->query("SELECT * FROM users WHERE username = '$username'");
+if($result->num_rows)
 {
   echo 'User already exists.'.PHP_EOL;
   exit(1);
@@ -29,10 +27,8 @@ if($query->fetch())
 
 try
 {
-  // add username to users table
-  $query = $db->prepare('INSERT INTO users SET username = ?');
-  $query->bind_param('s', $username);
-  $query->execute();
+  // add username to users table.
+  $db->query("INSERT INTO users SET username = '$username'");
 
   // create random sql password
   $keyspace = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890';
@@ -40,13 +36,12 @@ try
   while(strlen($sqlpass)<16) $sqlpass = $sqlpass.$keyspace[random_int(0, strlen($keyspace)-1)];
 
   // add sql user and permissions
-  $db->query('CREATE USER '.$username.'@localhost IDENTIFIED BY \''.$sqlpass.'\'');
-  $db->query('GRANT ALL PRIVILEGES ON `'.$username.'\_%`.* TO '.$username.'@localhost');
-  $db->query('FLUSH PRIVILEGES');
+  $db->query("CREATE USER $username@localhost IDENTIFIED BY '$sqlpass'");
+  $db->query("GRANT ALL PRIVILEGES ON `$username\_%`.* TO $username@localhost");
 
   // add system user
   $result_code = null;
-  passthru('useradd -m '.escapeshellarg($username), $result_code);
+  passthru("useradd -m $username", $result_code);
   if($result_code!==0) throw new Exception('Error encountered creating account with useradd command.');
 }
 catch (Exception | mysqli_sql_exception $e)
