@@ -105,6 +105,7 @@ PATH="$HOME/bin:$PATH"
 $ git clone https://github.com/brookgagnon/hue.git /root/hue
 $ mkdir /root/bin
 $ ln -s /root/hue/bin/hue-useradd /root/bin
+$ ln -s /root/hue/bin/hue-userdel /root/bin
 ```
 
 3. Run the hue install tool to create the hue database and tables.
