@@ -80,7 +80,7 @@ This installation provided adequate protection using try_files in /etc/nginx/sni
 try_files $fastcgi_script_name =404;
 ```
 
-Furthermore, security.limit_extensions is on by default:
+Furthermore, security.limit_extensions is on by default:  
 https://www.php.net/manual/en/install.fpm.configuration.php#security-limit-extensions
 
 # Render Configuration
