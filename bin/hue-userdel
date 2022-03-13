@@ -17,7 +17,7 @@ if(!$result->num_rows)
   exit(1);
 }
 
-echo PHP_EOL.'This will delete the system user, database user, home directory, and databases.'.PHP_EOL.'Are you sure you want to do this?'.PHP_EOL.PHP_EOL;
+echo PHP_EOL.'This will delete the system user, database user, home directory, and databases (TODO).'.PHP_EOL.'Are you sure you want to do this?'.PHP_EOL.PHP_EOL;
 $confirm = readline('Type the username again to confirm: ');
 if($confirm!=$username)
 {
@@ -28,7 +28,7 @@ if($confirm!=$username)
 try
 {
   // remove sql user
-  $db->query("DROP USER $username@localhost");
+  $db->query("DROP USER `$username`@localhost");
 
   // remove system user
   $result_code = null;

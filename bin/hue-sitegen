@@ -1,0 +1,47 @@
+#!/usr/bin/php
+<?php
+
+$driver = new mysqli_driver();
+$driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+
+$db = new mysqli('localhost','root','','hue');
+
+$result = $db->query('SELECT * FROM sites');
+
+$nginxconf = '';
+
+while($row = $result->fetch_assoc())
+{
+  // echo $row['username'].'/'.$row['sitename'].PHP_EOL;
+
+  $nginxconf .= "
+server {
+  listen 80;
+  listen [::]:80;
+
+  server_name {$row['fqdns']};
+
+  root /home/{$row['username']}/www/{$row['sitename']};
+  index index.html index.htm index.php;
+
+  location ~ /\.(?!well-known).* {
+    deny all;
+    return 404;
+  }
+
+  location / {
+    try_files \$uri \$uri/ =404;
+  }
+
+  location ~ \.php$ {
+    include snippets/fastcgi-php.conf;
+    fastcgi_pass unix:/var/run/php/php8.0-fpm.sock;
+  }
+}
+";
+
+}
+
+file_put_contents('/etc/nginx/conf.d/hue-sites.conf', $nginxconf);
+
+passthru('service nginx reload');

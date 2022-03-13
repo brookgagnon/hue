@@ -23,8 +23,7 @@ try
     CREATE TABLE `sites` (
       `id` int(10) UNSIGNED NOT NULL,
       `username` varchar(16) NOT NULL,
-      `name` varchar(32) NOT NULL,
-      `https` tinyint(1) NOT NULL,
+      `sitename` varchar(32) NOT NULL,
       `htpasswd` tinyint(1) NOT NULL,
       `fqdns` varchar(255) NOT NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=ascii;

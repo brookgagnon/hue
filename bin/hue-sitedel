@@ -1,0 +1,56 @@
+#!/usr/bin/php
+<?php
+
+$driver = new mysqli_driver();
+$driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+
+$db = new mysqli('localhost','root','','hue');
+
+// get username
+$username = readline('Username: ');
+
+// see if user exists
+$result = $db->query("SELECT * FROM users WHERE username = '{$db->real_escape_string($username)}'");
+if(!$result->num_rows)
+{
+  echo 'User doesn\'t seem to exist.'.PHP_EOL;
+  exit(1);
+}
+
+// get site name
+$sitename = readline('Site name: ');
+
+// see if site exists
+$result = $db->query("SELECT * FROM sites WHERE username = '$username' AND sitename = '$sitename'");
+if(!$result->num_rows)
+{
+  echo 'Site doesn\'t seem to exist.'.PHP_EOL;
+  exit(1);
+}
+
+try
+{
+  // delete certificate
+  $site = $result->fetch_assoc();
+  $fqdns = explode(' ',$site['fqdns']);
+  foreach($fqdns as $fqdn)
+  {
+    $result_code = null;
+    passthru("certbot delete -n --cert-name $fqdn", $result_code);
+    if($result_code!==0) throw new Exception('Error encountered removing certificates.');
+  }
+
+  // delete site record from database
+  $db->query("DELETE FROM sites WHERE username = '$username' AND sitename = '$sitename'"); 
+}
+catch(Exception | mysqli_sql_exception $e)
+{
+  $db->rollback();
+  echo $e.PHP_EOL;
+  exit(1);
+}
+
+// regenerate nginx config
+passthru(__DIR__.'/hue-sitegen');
+
+echo PHP_EOL.'Site deleted. Note that site root directory must be deleted manually if desired.'.PHP_EOL;

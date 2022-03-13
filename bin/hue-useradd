@@ -10,12 +10,19 @@ $db = new mysqli('localhost','root','','hue');
 do
 {
   $username = readline('Username: ');
-  if(preg_match('/[^a-z0-9]/',$username))
+  if(preg_match('/[^a-z0-9]/',$username) || strlen($username)>24)
   {
     echo 'Invalid username.'.PHP_EOL;
-    $username = false;
+    $username = null;
   }
 } while(!$username);
+
+// disallow user "hue" to prevent issue with database permissions
+if($username=='hue')
+{
+  echo 'Disallowed username.'.PHP_EOL;
+  exit(1);
+}
 
 // see if user exists
 $result = $db->query("SELECT * FROM users WHERE username = '$username'");
@@ -36,8 +43,8 @@ try
   while(strlen($sqlpass)<16) $sqlpass = $sqlpass.$keyspace[random_int(0, strlen($keyspace)-1)];
 
   // add sql user and permissions
-  $db->query("CREATE USER $username@localhost IDENTIFIED BY '$sqlpass'");
-  $db->query("GRANT ALL PRIVILEGES ON `$username\_%`.* TO $username@localhost");
+  $db->query("CREATE USER `$username`@localhost IDENTIFIED BY '$sqlpass'");
+  $db->query("GRANT ALL PRIVILEGES ON `$username\_%`.* TO `$username`@localhost");
 
   // add system user
   $result_code = null;

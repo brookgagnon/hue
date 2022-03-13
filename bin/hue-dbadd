@@ -1,0 +1,41 @@
+#!/usr/bin/php
+<?php
+
+$driver = new mysqli_driver();
+$driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+
+$db = new mysqli('localhost','root','','hue');
+
+// ask for username and validate
+$username = readline('Username: ');
+
+// see if user exists
+$result = $db->query("SELECT * FROM users WHERE username = '{$db->real_escape_string($username)}'");
+if(!$result->num_rows)
+{
+  echo 'User doesn\'t seem to exist.'.PHP_EOL;
+  exit(1);
+}
+
+// get db name
+do
+{
+  $dbname = readline("Database name: {$username}_");
+  if(preg_match('/[^a-z0-9_]/',$dbname) || substr($dbname, 0, 1)=='_' || substr($dbname,-1)=='_' || strlen($dbname)>39)
+  {
+    echo 'Invalid database name.'.PHP_EOL;
+    $dbname = null;
+  }
+} while(!$dbname);
+
+try
+{
+  $db->query("CREATE DATABASE {$username}_{$dbname}");
+}
+catch(Exception | mysqli_sql_exception $e)
+{
+  echo $e.PHP_EOL;
+  exit(1);
+}
+
+echo PHP_EOL.'Database created.'.PHP_EOL;
