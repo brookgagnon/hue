@@ -43,10 +43,6 @@ function useradd()
     if($result_code!==0) throw new Exception('Error encountered creating account with useradd command.');
 
     // add user record
-    if(!file_exists("/etc/hue"))
-    {
-      mkdir('/etc/hue', 0700);
-    }
     file_put_contents("/etc/hue/$username", json_encode(['sites'=>[], 'databases'=>[]]));
     chmod("/etc/hue/$username", 0600);
   }

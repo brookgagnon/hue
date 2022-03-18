@@ -46,25 +46,27 @@ function sitegen()
     }
 
     $fpmconf .= "[$username]
-  user = pikalabs
-  group = pikalabs
-  listen = /run/php/php8.0-pikalabs-fpm.sock
-  listen.owner = www-data
-  listen.group = www-data
-  pm = dynamic
-  pm.max_children = 5
-  pm.start_servers = 2
-  pm.min_spare_servers = 1
-  pm.max_spare_servers = 3
+user = pikalabs
+group = pikalabs
+listen = /run/php/php8.0-$username-fpm.sock
+listen.owner = www-data
+listen.group = www-data
+pm = dynamic
+pm.max_children = 5
+pm.start_servers = 2
+pm.min_spare_servers = 1
+pm.max_spare_servers = 3
 
-  ";
+";
 
   }
 
   file_put_contents('/etc/php/8.0/fpm/pool.d/hue.conf', $fpmconf);
   file_put_contents('/etc/nginx/conf.d/hue.conf', $nginxconf);
-  passthru('systemctl reload php8.0-fpm');
-  passthru('systemctl reload nginx');
+  passthru('systemctl restart php8.0-fpm');
+  passthru('systemctl restart nginx');
+
+  echo 'PHP-FPM pools and Nginx configuration updated.'.PHP_EOL;
 
   return true;
 }

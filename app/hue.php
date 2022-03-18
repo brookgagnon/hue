@@ -2,6 +2,13 @@
 
 require(__DIR__.'/hue-common.php');
 
+// init
+if(!file_exists("/etc/hue"))
+{
+  mkdir('/etc/hue', 0700);
+}
+
+// help
 echo '
 Commands:
 
@@ -15,6 +22,7 @@ Commands:
 
 ';
 
+// main
 while(true)
 {
   $command = trim(readline('hue> '));

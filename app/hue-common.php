@@ -23,7 +23,7 @@ function user_list()
 
   foreach($files as $file)
   {
-    $users[] = substr($file,5);
+    $users[] = $file;
   }
   
   return $users;

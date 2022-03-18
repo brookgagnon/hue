@@ -4,7 +4,7 @@
 // based on https://blog.programster.org/creating-phar-files
 try
 {
-    $pharFile = 'app.phar';
+    $pharFile = __DIR__.'/app.phar';
 
     // create phar
     $phar = new Phar($pharFile);
