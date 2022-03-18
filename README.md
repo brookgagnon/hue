@@ -83,6 +83,12 @@ try_files $fastcgi_script_name =404;
 Furthermore, security.limit_extensions is on by default:  
 https://www.php.net/manual/en/install.fpm.configuration.php#security-limit-extensions
 
+Finally, you may wish to remove the default php-fpm pool if not needed. Hue will handle creating pools for each user.
+
+```
+$ rm /etc/php/8.0/fpm/pool.d/www.conf
+```
+
 # Render Configuration
 
 

@@ -1,47 +1,71 @@
 #!/usr/bin/php
 <?php
 
-$driver = new mysqli_driver();
-$driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+namespace hue\commands;
 
-$db = new mysqli('localhost','root','','hue');
+function sitegen()
+  {
 
-$result = $db->query('SELECT * FROM sites');
+  $nginxconf = '';
+  $fpmconf = '';
 
-$nginxconf = '';
+  $users = \hue\user_list();
 
-while($row = $result->fetch_assoc())
-{
-  // echo $row['username'].'/'.$row['sitename'].PHP_EOL;
+  foreach($users as $username)
+  {
+    $info = \hue\user_get($username);
+    
+    foreach($info['sites'] as $sitename=>$site)
+    {
+      $server_name = implode(' ', $site['fqdns']);
 
-  $nginxconf .= "
-server {
-  listen 80;
-  listen [::]:80;
+      $nginxconf .= "server {
+    listen 80;
+    listen [::]:80;
 
-  server_name {$row['fqdns']};
+    server_name $server_name;
 
-  root /home/{$row['username']}/www/{$row['sitename']};
-  index index.html index.htm index.php;
+    root /home/$username/www/$sitename;
+    index index.html index.htm index.php;
 
-  location ~ /\.(?!well-known).* {
-    deny all;
-    return 404;
+    location ~ /\.(?!well-known).* {
+      deny all;
+      return 404;
+    }
+
+    location / {
+      try_files \$uri \$uri/ =404;
+    }
+
+    location ~ \.php$ {
+      include snippets/fastcgi-php.conf;
+      fastcgi_pass unix:/var/run/php/php8.0-$username-fpm.sock;
+    }
   }
 
-  location / {
-    try_files \$uri \$uri/ =404;
+  ";
+    }
+
+    $fpmconf .= "[$username]
+  user = pikalabs
+  group = pikalabs
+  listen = /run/php/php8.0-pikalabs-fpm.sock
+  listen.owner = www-data
+  listen.group = www-data
+  pm = dynamic
+  pm.max_children = 5
+  pm.start_servers = 2
+  pm.min_spare_servers = 1
+  pm.max_spare_servers = 3
+
+  ";
+
   }
 
-  location ~ \.php$ {
-    include snippets/fastcgi-php.conf;
-    fastcgi_pass unix:/var/run/php/php8.0-fpm.sock;
-  }
+  file_put_contents('/etc/php/8.0/fpm/pool.d/hue.conf', $fpmconf);
+  file_put_contents('/etc/nginx/conf.d/hue.conf', $nginxconf);
+  passthru('systemctl reload php8.0-fpm');
+  passthru('systemctl reload nginx');
+
+  return true;
 }
-";
-
-}
-
-file_put_contents('/etc/nginx/conf.d/hue-sites.conf', $nginxconf);
-
-passthru('service nginx reload');

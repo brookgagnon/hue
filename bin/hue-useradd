@@ -1,62 +1,65 @@
 #!/usr/bin/php
 <?php
 
-$driver = new mysqli_driver();
-$driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+namespace hue\commands;
 
-$db = new mysqli('localhost','root','','hue');
-
-// ask for username and validate
-do
-{
-  $username = readline('Username: ');
-  if(preg_match('/[^a-z0-9]/',$username) || strlen($username)>24)
+function useradd()
   {
-    echo 'Invalid username.'.PHP_EOL;
-    $username = null;
+
+  $driver = new \mysqli_driver();
+  $driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+
+  $db = new \mysqli('localhost','root');
+
+  // ask for username and validate
+  do
+  {
+    $username = readline('Username: ');
+    if(preg_match('/[^a-z0-9]/',$username) || strlen($username)>24)
+    {
+      echo 'Invalid username.'.PHP_EOL;
+      $username = null;
+    }
+  } while(!$username);
+
+  // see if user exists
+  if(\hue\system_user_exists($username))
+  {
+    echo 'User already exists.'.PHP_EOL;
+    return false;
   }
-} while(!$username);
 
-// disallow user "hue" to prevent issue with database permissions
-if($username=='hue')
-{
-  echo 'Disallowed username.'.PHP_EOL;
-  exit(1);
+  try
+  {
+    // create random sql password
+    $sqlpass = \hue\random_password(16);
+
+    // add sql user and permissions
+    $db->query("CREATE USER `$username`@localhost IDENTIFIED BY '$sqlpass'");
+    $db->query("GRANT ALL PRIVILEGES ON `$username\_%`.* TO `$username`@localhost");
+
+    // add system user
+    $result_code = null;
+    passthru("useradd -m $username", $result_code);
+    if($result_code!==0) throw new Exception('Error encountered creating account with useradd command.');
+
+    // add user record
+    if(!file_exists("/etc/hue"))
+    {
+      mkdir('/etc/hue', 0700);
+    }
+    file_put_contents("/etc/hue/$username", json_encode(['sites'=>[], 'databases'=>[]]));
+    chmod("/etc/hue/$username", 0600);
+  }
+  catch (Exception | mysqli_sql_exception $e)
+  {
+    echo $e.PHP_EOL;
+    return false;
+  }
+
+  echo 'User "'.$username.'" added.'.PHP_EOL;
+  echo 'SQL Username: '.$username.PHP_EOL;
+  echo 'SQL Password: '.$sqlpass.PHP_EOL;
+
+  return true;
 }
-
-// see if user exists
-$result = $db->query("SELECT * FROM users WHERE username = '$username'");
-if($result->num_rows)
-{
-  echo 'User already exists.'.PHP_EOL;
-  exit(1);
-}
-
-try
-{
-  // add username to users table.
-  $db->query("INSERT INTO users SET username = '$username'");
-
-  // create random sql password
-  $keyspace = 'qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890';
-  $sqlpass = '';
-  while(strlen($sqlpass)<16) $sqlpass = $sqlpass.$keyspace[random_int(0, strlen($keyspace)-1)];
-
-  // add sql user and permissions
-  $db->query("CREATE USER `$username`@localhost IDENTIFIED BY '$sqlpass'");
-  $db->query("GRANT ALL PRIVILEGES ON `$username\_%`.* TO `$username`@localhost");
-
-  // add system user
-  $result_code = null;
-  passthru("useradd -m $username", $result_code);
-  if($result_code!==0) throw new Exception('Error encountered creating account with useradd command.');
-}
-catch (Exception | mysqli_sql_exception $e)
-{
-  echo $e.PHP_EOL;
-  exit(1);
-}
-
-echo 'User "'.$username.'" added.'.PHP_EOL;
-echo 'SQL Username: '.$username.PHP_EOL;
-echo 'SQL Password: '.$sqlpass.PHP_EOL;

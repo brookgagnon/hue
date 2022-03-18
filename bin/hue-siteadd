@@ -1,101 +1,97 @@
 #!/usr/bin/php
 <?php
 
-$driver = new mysqli_driver();
-$driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
+namespace hue\commands;
 
-$db = new mysqli('localhost','root','','hue');
-
-// ask for username and validate
-$username = readline('Username: ');
-
-// see if user exists
-$result = $db->query("SELECT * FROM users WHERE username = '{$db->real_escape_string($username)}'");
-if(!$result->num_rows)
+function siteadd()
 {
-  echo 'User doesn\'t seem to exist.'.PHP_EOL;
-  exit(1);
-}
 
-// get site name
-do
-{
-  $sitename = readline('Site name: ');
-  if(preg_match('/[^a-z0-9-]/',$sitename) || substr($sitename, 0, 1)=='-' || substr($sitename,-1)=='-')
+  // ask for username and validate
+  $username = readline('Username: ');
+
+  // see if user exists
+  if(!\hue\user_get($username))
   {
-    echo 'Invalid site name.'.PHP_EOL;
-    $sitename = null;
+    echo 'User doesn\'t seem to exist.'.PHP_EOL;
+    return false;
   }
-} while(!$sitename);
 
-// see if site exists
-$result = $db->query("SELECT * FROM sites WHERE username = '$username' AND sitename = '$sitename'");
-if($result->num_rows)
-{
-  echo 'Site already exists.'.PHP_EOL;
-  exit(1);
-}
-
-// get fqdns and validate
-do
-{
-  $fqdns = readline('FQDNs (space separated): ');
-  $fqdn_array = array_unique(explode(' ', $fqdns));
-  foreach($fqdn_array as $fqdn)
+  // get site name
+  do
   {
-    if(!filter_var($fqdn, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME))
+    $sitename = readline('Site name: ');
+    if(preg_match('/[^a-z0-9-]/',$sitename) || substr($sitename, 0, 1)=='-' || substr($sitename,-1)=='-')
     {
-      $fqdns = null;
-      echo 'One or more invalid FQDNs.'.PHP_EOL;
+      echo 'Invalid site name.'.PHP_EOL;
+      $sitename = null;
+    }
+  } while(!$sitename);
+
+  // see if site exists
+  $info = \hue\user_get($username);
+  if(isset($info['sites'][$sitename]))
+  {
+    echo 'Site already exists.'.PHP_EOL;
+    return false;
+  }
+
+  // get fqdns and validate
+  do
+  {
+    $fqdns = readline('FQDNs (space separated): ');
+    $fqdns = array_unique(explode(' ', $fqdns));
+    foreach($fqdns as $fqdn)
+    {
+      if(!filter_var($fqdn, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME))
+      {
+        $fqdns = null;
+        echo 'One or more invalid FQDNs.'.PHP_EOL;
+      }
+    }
+  } while(!$fqdns);
+
+  // output IP addresses
+  foreach($fqdns as $fqdn)
+  {
+    echo $fqdn.': '.gethostbyname($fqdn).PHP_EOL;
+  }
+
+  try
+  {
+    $info = \hue\user_get($username);
+
+    // add site to hue user file
+    $info['sites'][$sitename] = [
+      'fqdns' => $fqdns
+    ];
+    \hue\user_save($username, $info);
+
+    // create site root directory
+    if(!file_exists("/home/$username/www"))
+    {
+      mkdir("/home/$username/www", 0750);
+      chown("/home/$username/www", $username);
+      chgrp("/home/$username/www", 'www-data');
+    }
+    if(!file_exists("/home/$username/www/$sitename"))
+    {
+      mkdir("/home/$username/www/$sitename", 0750);
+      chown("/home/$username/www/$sitename", $username);
+      chgrp("/home/$username/www/$sitename", 'www-data');
     }
   }
-} while(!$fqdns);
-
-// put together new space-separated string with valid FQDNs (unique only)
-$fqdns = implode(' ',$fqdn_array);
-
-// output IP addresses
-foreach($fqdn_array as $fqdn)
-{
-  echo $fqdn.': '.gethostbyname($fqdn).PHP_EOL;
-}
-
-try
-{
-  // add site record to database
-  $db->query("INSERT INTO sites SET
-    username = '$username',
-    sitename = '$sitename',
-    htpasswd = 0,
-    fqdns = '$fqdns'
-  ");
-
-  // create site root directory
-  if(!file_exists("/home/$username/www"))
+  catch (Exception | mysqli_sql_exception $e)
   {
-    mkdir("/home/$username/www", 0750);
-    chown("/home/$username/www", $username);
-    chgrp("/home/$username/www", 'www-data');
+    echo $e.PHP_EOL;
+    return false;
   }
-  if(!file_exists("/home/$username/www/$sitename"))
-  {
-    mkdir("/home/$username/www/$sitename", 0750);
-    chown("/home/$username/www/$sitename", $username);
-    chgrp("/home/$username/www/$sitename", 'www-data');
-  }
+
+  // regenerate nginx config
+  passthru(__DIR__.'/hue-sitegen');
+
+  // letsencrypt
+  // passthru('certbot certonly --nginx -d '.implode(',',$fqdn_array).' --agree-tos --no-eff-email -m brook@pikalabs.com');
+
+  echo PHP_EOL.'Site added.'.PHP_EOL;
+  return true;
 }
-catch (Exception | mysqli_sql_exception $e)
-{
-  $db->rollback();
-  echo $e.PHP_EOL;
-  exit(1);
-}
-
-// regenerate nginx config
-passthru(__DIR__.'/hue-sitegen');
-
-// letsencrypt
-passthru('certbot certonly --nginx -d '.implode(',',$fqdns).' --agree-tos --no-eff-email -m brook@pikalabs.com');
-
-
-echo PHP_EOL.'Site added.'.PHP_EOL;
