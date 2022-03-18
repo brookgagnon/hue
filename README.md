@@ -8,7 +8,7 @@
   * Accept HTTPS (anywhere)
   * Accept SSH (custom, IPs as needed)
   * Drop any (all ports) 
-  * Enable backups
+* Enable backups
 
 # Server Initialization
 
