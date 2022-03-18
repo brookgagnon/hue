@@ -33,15 +33,19 @@ function userdel()
     // remove sql user
     $db->query("DROP USER `$username`@localhost");
 
-    // remove system user
+    // remove user record
+    passthru("rm -rf /etc/hue/$username");
+
+    // run sitegen to update remove user php-fpm pool
+    \hue\commands\sitegen();
+
+    // remove system user (must be done after sitegen to remove user php-fpm pool first)
     $result_code = null;
     passthru("userdel -r $username", $result_code);
-    if($result_code!==0) throw new Exception('Error removing account with userdel command.');
+    if($result_code!==0) throw new \Exception('Error removing account with userdel command.');
 
-    // remove user record
-    unlink("/etc/hue/$username");
   }
-  catch (Exception | mysqli_sql_exception $e)
+  catch (\Exception | \mysqli_sql_exception $e)
   {
     echo $e.PHP_EOL;
     return false;

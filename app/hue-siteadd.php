@@ -55,13 +55,39 @@ function siteadd()
     echo $fqdn.': '.gethostbyname($fqdn).PHP_EOL;
   }
 
+  // site configuration
+  $config_options = ['static', 'wordpress'];
+  do
+  {
+    $config = trim(readline('Site Configuration (0: Default/Static or 1: WordPress): '));
+    if(!isset($config_options[$config]))
+    {
+      echo 'Enter 0 or 1.'.PHP_EOL;
+      $config = null;
+    }
+  } while(!$config);
+  $config = $config_options[$config];
+
+  // http auth
+  do
+  {
+    $authuser = trim(readline('HTTP Authentication Username (optional): '));
+    if(!$authuser) break;
+    elseif(preg_match('/[^a-z0-9]/',$authuser) || strlen($authuser)>24)
+    {
+      echo 'Invalid username.'.PHP_EOL;
+      $authuser = null;
+    }
+  } while(!$authuser);
+
   try
   {
     $info = \hue\user_get($username);
 
     // add site to hue user file
     $info['sites'][$sitename] = [
-      'fqdns' => $fqdns
+      'fqdns' => $fqdns,
+      'config' => $config
     ];
     \hue\user_save($username, $info);
 
@@ -78,15 +104,25 @@ function siteadd()
       chown("/home/$username/www/$sitename", $username);
       chgrp("/home/$username/www/$sitename", 'www-data');
     }
+
+    // handle http auth
+    if($authuser)
+    {
+      $authpass = \hue\random_password(16);
+      echo "HTTP Authentication Password: $authpass".PHP_EOL;
+      passthru("htpasswd -bc /etc/hue/$username/$sitename.htpasswd $authuser $authpass");
+      chgrp("/etc/hue/$username/$sitename.htpasswd", 'www-data');
+      chmod("/etc/hue/$username/$sitename.htpasswd", 0440);
+    }
   }
-  catch (Exception | mysqli_sql_exception $e)
+  catch (\Exception | \mysqli_sql_exception $e)
   {
     echo $e.PHP_EOL;
     return false;
   }
 
   // regenerate nginx config
-  passthru(__DIR__.'/hue-sitegen');
+  \hue\commands\sitegen();
 
   // letsencrypt
   // passthru('certbot certonly --nginx -d '.implode(',',$fqdn_array).' --agree-tos --no-eff-email -m brook@pikalabs.com');

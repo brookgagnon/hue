@@ -19,6 +19,12 @@ Vultr Dedicated Cloud\
 
 ## Initial Configuration
 
+Remove the default non-root user:
+
+```
+# userdel -r ubuntu
+```
+
 Enable reboot after automatic updates, if necessary, by editing /etc/apt/apt.conf.d/50unattended-upgrades:
 
 ```
@@ -37,13 +43,13 @@ PasswordAuthentication no
 ## Nginx
 
 ```
-$ add-apt-repository ppa:ondrej/nginx
-$ apt update
-$ apt upgrade
-$ apt install nginx
-$ ufw allow http
-$ ufw allow https
-$ snap install --classic certbot
+# add-apt-repository ppa:ondrej/nginx
+# apt update
+# apt upgrade
+# apt install nginx apache2-utils
+# ufw allow http
+# ufw allow https
+# snap install --classic certbot
 ```
 
 ## MariaDB
@@ -51,8 +57,8 @@ $ snap install --classic certbot
 Install MariaDB and run configuration script. Root password can be stored in password manager (though not needed for access when logged in as root). Since the root user uses "unix_socket" plugin, setting a password may actually be unnecessary.
 
 ```
-$ apt install mariadb-server
-$ mysql_secure_installation
+# apt install mariadb-server
+# mysql_secure_installation
 
 Change the root password? [Y/n] y
 Remove anonymous users? [Y/n] y
@@ -64,10 +70,10 @@ Reload privilege tables now? [Y/n] y
 ## PHP 8.0
 
 ```
-$ add-apt-repository ppa:ondrej/php
-$ apt update
-$ apt upgrade
-$ apt install php8.0 php8.0-fpm php8.0-curl php8.0-gd php8.0-mbstring php8.0-mysql php8.0-xml php8.0-imagick php8.0-zip php8.0-bcmath php8.0-intl
+# add-apt-repository ppa:ondrej/php
+# apt update
+# apt upgrade
+# apt install php8.0 php8.0-fpm php8.0-curl php8.0-gd php8.0-mbstring php8.0-mysql php8.0-xml php8.0-imagick php8.0-zip php8.0-bcmath php8.0-intl
 ```
 
 Following installation, ensure configuration protects again this security issue:
@@ -86,7 +92,7 @@ https://www.php.net/manual/en/install.fpm.configuration.php#security-limit-exten
 Finally, you may wish to remove the default php-fpm pool if not needed. Hue will handle creating pools for each user.
 
 ```
-$ rm /etc/php/8.0/fpm/pool.d/www.conf
+# rm /etc/php/8.0/fpm/pool.d/www.conf
 ```
 
 # Hue
@@ -106,7 +112,7 @@ PATH="$HOME/bin:$PATH"
 2. Clone hue repository and create symlinks to hue bin scripts.
 
 ```
-$ git clone https://github.com/brookgagnon/hue.git /root/hue
-$ mkdir /root/bin
-$ ln -s /root/hue/bin/* /root/bin
+# git clone https://github.com/brookgagnon/hue.git /root/hue
+# mkdir /root/bin
+# ln -s /root/hue/bin/* /root/bin
 ```

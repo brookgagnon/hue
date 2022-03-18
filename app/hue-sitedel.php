@@ -29,14 +29,14 @@ function sitedel()
     {
       $result_code = null;
       //passthru("certbot delete -n --cert-name $fqdn", $result_code);
-      // if($result_code!==0) throw new Exception('Error encountered removing certificates.');
+      // if($result_code!==0) throw new \Exception('Error encountered removing certificates.');
     }
 
     // delete site from user record
     unset($info['sites'][$sitename]);
     \hue\user_save($username, $info);
   }
-  catch(Exception | mysqli_sql_exception $e)
+  catch(\Exception | \mysqli_sql_exception $e)
   {
     echo $e.PHP_EOL;
     return false;

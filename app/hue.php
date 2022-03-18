@@ -1,11 +1,30 @@
 <?php
 
+if(get_current_user()!=='root')
+{
+  echo 'Hue must be run as root.'.PHP_EOL;
+  exit(1);
+}
+
+if(php_sapi_name()!=='cli')
+{
+  echo 'Hue must be run using PHP CLI.'.PHP_EOL;
+  exit(1);
+}
+
 require(__DIR__.'/hue-common.php');
+require(__DIR__.'/hue-dbadd.php');
+require(__DIR__.'/hue-dbdel.php');
+require(__DIR__.'/hue-siteadd.php');
+require(__DIR__.'/hue-sitedel.php');
+require(__DIR__.'/hue-sitegen.php');
+require(__DIR__.'/hue-useradd.php');
+require(__DIR__.'/hue-userdel.php');
 
 // init
 if(!file_exists("/etc/hue"))
 {
-  mkdir('/etc/hue', 0700);
+  mkdir('/etc/hue', 0755);
 }
 
 // help
@@ -29,10 +48,8 @@ while(true)
 
   if($command=='exit') exit(0);
 
-  $file = __DIR__."/hue-$command.php";
-  if(file_exists($file))
+  if(function_exists("\hue\commands\\$command"))
   {
-    require_once($file);
     echo PHP_EOL;
     call_user_func("\hue\commands\\$command");
     echo PHP_EOL;

@@ -13,7 +13,8 @@ function sitegen()
   foreach($users as $username)
   {
     $info = \hue\user_get($username);
-    
+    if(empty($info['sites'])) continue;    
+
     foreach($info['sites'] as $sitename=>$site)
     {
       $server_name = implode(' ', $site['fqdns']);

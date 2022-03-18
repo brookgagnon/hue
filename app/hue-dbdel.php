@@ -37,7 +37,7 @@ function dbdel()
     // drop database
     $db->query("DROP DATABASE {$username}_{$dbname}");
   }
-  catch(Exception | mysqli_sql_exception $e)
+  catch(\Exception | \mysqli_sql_exception $e)
   {
     echo $e.PHP_EOL;
     return false;

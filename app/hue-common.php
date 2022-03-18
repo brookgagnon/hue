@@ -31,13 +31,13 @@ function user_list()
 
 function user_get($username)
 {
-  if(!file_exists("/etc/hue/$username")) return false;
-  return json_decode(file_get_contents("/etc/hue/$username"), true);
+  if(!file_exists("/etc/hue/$username/hue.json")) return false;
+  return json_decode(file_get_contents("/etc/hue/$username/hue.json"), true);
 }
 
 function user_save($username, $info)
 {
-  file_put_contents("/etc/hue/$username", json_encode($info));
+  file_put_contents("/etc/hue/$username/hue.json", json_encode($info));
 }
 
 function random_password($length)

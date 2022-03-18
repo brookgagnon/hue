@@ -34,19 +34,21 @@ function useradd()
     $sqlpass = \hue\random_password(16);
 
     // add sql user and permissions
+    echo "CREATE USER `$username`@localhost IDENTIFIED BY '$sqlpass'";
     $db->query("CREATE USER `$username`@localhost IDENTIFIED BY '$sqlpass'");
     $db->query("GRANT ALL PRIVILEGES ON `$username\_%`.* TO `$username`@localhost");
 
     // add system user
     $result_code = null;
     passthru("useradd -m $username", $result_code);
-    if($result_code!==0) throw new Exception('Error encountered creating account with useradd command.');
+    if($result_code!==0) throw new \Exception('Error encountered creating account with useradd command.');
 
     // add user record
-    file_put_contents("/etc/hue/$username", json_encode(['sites'=>[], 'databases'=>[]]));
-    chmod("/etc/hue/$username", 0600);
+    mkdir("/etc/hue/$username",0755);
+    file_put_contents("/etc/hue/$username/hue.json", json_encode(['sites'=>[], 'databases'=>[]]));
+    chmod("/etc/hue/$username/hue.json", 0600);
   }
-  catch (Exception | mysqli_sql_exception $e)
+  catch (\Exception | \mysqli_sql_exception $e)
   {
     echo $e.PHP_EOL;
     return false;
