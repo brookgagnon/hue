@@ -41,10 +41,24 @@ Commands:
 
 ';
 
+// write history on shutdown
+function hue_write_history()
+{
+  readline_write_history('/root/.hue_history');
+}
+register_shutdown_function('hue_write_history');
+pcntl_async_signals(true);
+pcntl_signal(SIGINT,function($signal) { hue_write_history(); exit(0); }); 
+
 // main
+readline_read_history('/root/.hue_history');
 while(true)
 {
-  $command = trim(readline('hue> '));
+  do
+  {
+    $command = trim(readline('hue> '));
+  } while($command=='');
+  readline_add_history($command);
 
   if($command=='exit') exit(0);
 
