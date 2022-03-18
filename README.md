@@ -47,6 +47,12 @@ PasswordAuthentication no
 # snap install --classic certbot
 ```
 
+Remove the default site:
+
+```
+# rm /etc/nginx/sites-enabled/default
+```
+
 ## MariaDB
 
 Install MariaDB and run configuration script. Root password can be stored in password manager (though not needed for access when logged in as root). Since the root user uses "unix_socket" plugin, setting a password may actually be unnecessary.
