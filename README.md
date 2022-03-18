@@ -96,7 +96,7 @@ $ rm /etc/php/8.0/fpm/pool.d/www.conf
 
 ## Introduction
 
-Hue tools are a set of helper scripts for user management based on this server configuration.
+Hue is a helper tool for user management based on this server configuration.
 
 ## Installation
 
@@ -112,10 +112,4 @@ PATH="$HOME/bin:$PATH"
 $ git clone https://github.com/brookgagnon/hue.git /root/hue
 $ mkdir /root/bin
 $ ln -s /root/hue/bin/* /root/bin
-```
-
-3. Run the hue install tool to create the hue database and tables.
-
-```
-$ hue-install
 ```
