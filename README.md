@@ -1,12 +1,6 @@
-# Current Specs
+# Suggested Vultr Configuration
 
-Vultr Dedicated Cloud\
-120GB SSD\
-2 vCPU\
-8 GB Memory
-
-# Vultr Configuration
-
+* Optimized Cloud
 * Disable IPv6
 * Enable DDOS Protection
 * Add Firewall Group, ensure server connected to this group
@@ -14,6 +8,7 @@ Vultr Dedicated Cloud\
   * Accept HTTPS (anywhere)
   * Accept SSH (custom, IPs as needed)
   * Drop any (all ports) 
+  * Enable backups
 
 # Server Initialization
 
