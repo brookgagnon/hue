@@ -34,7 +34,6 @@ function useradd()
     $sqlpass = \hue\random_password(16);
 
     // add sql user and permissions
-    echo "CREATE USER `$username`@localhost IDENTIFIED BY '$sqlpass'";
     $db->query("CREATE USER `$username`@localhost IDENTIFIED BY '$sqlpass'");
     $db->query("GRANT ALL PRIVILEGES ON `$username\_%`.* TO `$username`@localhost");
 

@@ -3,8 +3,7 @@
 namespace hue\commands;
 
 function sitegen()
-  {
-
+{
   $nginxconf = '';
   $fpmconf = '';
 
@@ -17,32 +16,86 @@ function sitegen()
 
     foreach($info['sites'] as $sitename=>$site)
     {
+      if($site['config']=='wordpress')
+      {
+        $index = 'index.php';
+        $try_files = '$uri $uri/ /index.php?$args';
+      }
+      else {
+        $index = 'index.html index.htm index.php';
+        $try_files = '$uri $uri/ =404';
+      }
+
       $server_name = implode(' ', $site['fqdns']);
+      $cert_dir = $site['fqdns'][0];
+      $https = file_exists("/etc/letsencrypt/live/$cert_dir");
+      
+      if($https)
+      {
 
-      $nginxconf .= "server {
-    listen 80;
-    listen [::]:80;
+        $nginx_listen = "
+  listen 443 ssl;
+  ssl_certificate /etc/letsencrypt/live/$cert_dir/fullchain.pem;
+  ssl_certificate_key /etc/letsencrypt/live/$cert_dir/privkey.pem;
+  include /etc/letsencrypt/options-ssl-nginx.conf;
+  ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+        ";
 
-    server_name $server_name;
+        $nginx_after = "
+server {
+  server_name $server_name;
+  listen 80;
+  return 301 https://\$host\$request_uri;
+}
+        ";
 
-    root /home/$username/www/$sitename;
-    index index.html index.htm index.php;
+      }
 
-    location ~ /\.(?!well-known).* {
-      deny all;
-      return 404;
-    }
+      else
+      {
 
-    location / {
-      try_files \$uri \$uri/ =404;
-    }
+        $nginx_listen = "
+  listen 80;
+        ";
 
-    location ~ \.php$ {
-      include snippets/fastcgi-php.conf;
-      fastcgi_pass unix:/var/run/php/php8.0-$username-fpm.sock;
-    }
+        $nginx_after = '';
+
+      }
+
+      if(file_exists("/etc/hue/$username/$sitename.htpasswd"))
+      {
+        $nginx_auth = "
+  auth_basic \"Authentication Required\";
+  auth_basic_user_file /etc/hue/$username/$sitename.htpasswd;
+        ";
+      }
+      else $nginx_auth = "";
+
+      $nginxconf .= "
+server {
+  server_name $server_name;
+  $nginx_listen
+  $nginx_auth
+
+  root /home/$username/www/$sitename;
+  index $index;
+
+  location ~ /\.(?!well-known).* {
+    deny all;
+    return 404;
   }
 
+  location / {
+    try_files $try_files;
+  }
+
+  location ~ \.php$ {
+    include snippets/fastcgi-php.conf;
+    fastcgi_pass unix:/var/run/php/php8.0-$username-fpm.sock;
+  }
+}
+
+$nginx_after
   ";
     }
 

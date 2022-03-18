@@ -24,13 +24,17 @@ function sitedel()
 
   try
   {
-    // delete certificate
-    foreach($site['fqdns'] as $fqdn)
+    // delete certificate (if it exists)
+    $cert = $site['fqdns'][0];
+    if(file_exists("/etc/letsencrypt/live/$cert"))
     {
       $result_code = null;
-      //passthru("certbot delete -n --cert-name $fqdn", $result_code);
-      // if($result_code!==0) throw new \Exception('Error encountered removing certificates.');
+      passthru("certbot delete -n --cert-name $cert", $result_code);
+      if($result_code!==0) throw new \Exception('Error encountered removing certificates.');
     }
+
+    // delete htpasswd if applicable
+    passthru("rm -f /etc/hue/$username/$sitename.htpasswd");
 
     // delete site from user record
     unset($info['sites'][$sitename]);

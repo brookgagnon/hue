@@ -65,8 +65,15 @@ function siteadd()
       echo 'Enter 0 or 1.'.PHP_EOL;
       $config = null;
     }
-  } while(!$config);
+  } while($config===null);
   $config = $config_options[$config];
+
+  // https
+  do
+  {
+    $https = strtolower(readline("Enable HTTPs with Let's Encrypt? (Y/n): "));
+  } while($https!='n' && $https!='y');
+  $https = ($https == 'y');
 
   // http auth
   do
@@ -121,11 +128,11 @@ function siteadd()
     return false;
   }
 
+  // letsencrypt
+  if($https) passthru('certbot certonly --nginx -d '.implode(',',$fqdns).' --agree-tos --no-eff-email -m brook@pikalabs.com');
+
   // regenerate nginx config
   \hue\commands\sitegen();
-
-  // letsencrypt
-  // passthru('certbot certonly --nginx -d '.implode(',',$fqdn_array).' --agree-tos --no-eff-email -m brook@pikalabs.com');
 
   echo PHP_EOL.'Site added.'.PHP_EOL;
   return true;
