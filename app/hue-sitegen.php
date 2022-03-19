@@ -100,8 +100,8 @@ $nginx_after
     }
 
     $fpmconf .= "[$username]
-user = pikalabs
-group = pikalabs
+user = $username
+group = $username
 listen = /run/php/php8.0-$username-fpm.sock
 listen.owner = www-data
 listen.group = www-data

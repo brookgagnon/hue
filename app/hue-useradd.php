@@ -3,7 +3,7 @@
 namespace hue\commands;
 
 function useradd()
-  {
+{
 
   $driver = new \mysqli_driver();
   $driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
@@ -39,7 +39,7 @@ function useradd()
 
     // add system user
     $result_code = null;
-    passthru("useradd -m $username", $result_code);
+    passthru("useradd --shell /bin/bash -m $username", $result_code);
     if($result_code!==0) throw new \Exception('Error encountered creating account with useradd command.');
 
     // add user record
