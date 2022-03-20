@@ -1,6 +1,6 @@
 <?php
 
-if(get_current_user()!=='root')
+if(exec('whoami')!=='root')
 {
   echo 'Hue must be run as root.'.PHP_EOL;
   exit(1);
