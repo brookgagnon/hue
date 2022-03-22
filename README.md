@@ -96,6 +96,10 @@ Finally, you may wish to remove the default php-fpm pool if not needed. Hue will
 # rm /etc/php/8.0/fpm/pool.d/www.conf
 ```
 
+# Mail
+
+Mail is not supported by this configuration (but can be added). For outgoing emails (transactional, reports, etc), consider using ssmtp with a service like [Postmark](https://postmarkapp.com/) for ease of use and improved deliverability.
+
 # Hue
 
 ## Introduction
