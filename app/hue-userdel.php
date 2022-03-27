@@ -1,8 +1,8 @@
 <?php
 
-namespace hue\commands;
+namespace hue\commands\user;
 
-function userdel()
+function del()
 {
   $driver = new \mysqli_driver();
   $driver->report_mode = MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT;
@@ -36,7 +36,7 @@ function userdel()
     passthru("rm -rf /etc/hue/$username");
 
     // run sitegen to update remove user php-fpm pool
-    \hue\commands\sitegen();
+    \hue\commands\site\gen();
 
     // remove system user (must be done after sitegen to remove user php-fpm pool first)
     $result_code = null;

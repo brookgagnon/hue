@@ -1,8 +1,8 @@
 <?php
 
-namespace hue\commands;
+namespace hue\commands\user;
 
-function useradd()
+function add()
 {
 
   $driver = new \mysqli_driver();

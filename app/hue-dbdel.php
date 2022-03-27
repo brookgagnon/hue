@@ -1,8 +1,8 @@
 <?php
 
-namespace hue\commands;
+namespace hue\commands\db;
 
-function dbdel()
+function del()
 {
 
   $driver = new \mysqli_driver();

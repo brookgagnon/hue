@@ -1,6 +1,6 @@
 <?php
 
-namespace hue\commands;
+namespace hue\commands\db;
 
 function dbadd()
 {

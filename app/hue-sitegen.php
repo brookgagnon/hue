@@ -1,8 +1,8 @@
 <?php
 
-namespace hue\commands;
+namespace hue\commands\site;
 
-function sitegen()
+function gen()
 {
   $nginxconf = '';
   $fpmconf = '';

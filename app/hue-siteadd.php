@@ -1,8 +1,8 @@
 <?php
 
-namespace hue\commands;
+namespace hue\commands\site;
 
-function siteadd()
+function add()
 {
 
   // ask for username and validate
@@ -132,7 +132,7 @@ function siteadd()
   if($https) passthru('certbot certonly --nginx -d '.implode(',',$fqdns).' --agree-tos --no-eff-email -m brook@pikalabs.com');
 
   // regenerate nginx config
-  \hue\commands\sitegen();
+  \hue\commands\site\gen();
 
   echo PHP_EOL.'Site added.'.PHP_EOL;
   return true;

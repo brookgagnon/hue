@@ -31,13 +31,13 @@ if(!file_exists("/etc/hue"))
 echo '
 Commands:
 
-> dbadd
-> dbdel
-> siteadd
-> sitedel
-> sitegen
-> useradd
-> userdel
+> db add
+> db del
+> site add
+> site del
+> site gen
+> user add
+> user del
 
 ';
 
@@ -62,10 +62,14 @@ while(true)
 
   if($command=='exit') exit(0);
 
-  if(function_exists("\hue\commands\\$command"))
+  $command_parts = explode(' ',$command);
+  $command_namespace = $command_parts[0] ?? null;
+  $command_function = $command_parts[1] ?? null;
+
+  if($command_namespace && $command_function && function_exists("\hue\commands\\$command_namespace\\$command_function"))
   {
     echo PHP_EOL;
-    call_user_func("\hue\commands\\$command");
+    call_user_func("\hue\commands\\$command_namespace\\$command_function");
     echo PHP_EOL;
   }
   else echo PHP_EOL.'Command not found.'.PHP_EOL.PHP_EOL;

@@ -1,8 +1,8 @@
 <?php
 
-namespace hue\commands;
+namespace hue\commands\site;
 
-function sitedel()
+function del()
 {
   // get username
   $username = readline('Username: ');
@@ -47,7 +47,7 @@ function sitedel()
   }
 
   // regenerate nginx config
-  \hue\commands\sitegen();
+  \hue\commands\site\gen();
 
   echo PHP_EOL.'Site deleted. Note that site root directory must be deleted manually if desired.'.PHP_EOL;
   return;
