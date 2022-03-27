@@ -121,3 +121,8 @@ PATH="$HOME/bin:$PATH"
 # mkdir /root/bin
 # ln -s /root/hue/bin/* /root/bin
 ```
+
+# Optional
+
+* Install dart-sass to /usr/local/bin/sass
+* Install wp-cli to /usr/local/bin/wp
