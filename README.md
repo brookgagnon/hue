@@ -126,3 +126,4 @@ PATH="$HOME/bin:$PATH"
 
 * Install dart-sass to /usr/local/bin/sass
 * Install wp-cli to /usr/local/bin/wp
+* Install composer to /usr/local/bin/composer
