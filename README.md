@@ -115,7 +115,7 @@ Finally, you may wish to remove the default php-fpm pool if not needed. Hue will
 # rm /etc/php/8.0/fpm/pool.d/www.conf
 ```
 
-## Hue
+## Hue Installation
 
 ### Introduction
 
