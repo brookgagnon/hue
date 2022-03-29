@@ -1,4 +1,23 @@
-# Suggested Vultr Configuration
+# Introduction
+
+Hue is a minimal set of scripts for managing a [LEMP](https://lemp.io/) server on Ubuntu Server 20.04 LTS. It is designed for web developers to provide an inexpective, high performance server for clients (one or more clients per VPS).
+
+## Current Functionality
+
+* Guide for server set up (below)
+* Add and remove users
+* Add and remove sites (including and Let's Encrypt / HTTPS and optional HTTP authentication)
+* Add and remove databases
+
+## Possible Upcoming Functionality
+
+* Edit users, sites, and databases
+* Script to initialize server from fresh Ubuntu Server 20.02 install
+* Server configuration options such as [Postmark](https://postmarkapp.com/) via sSMTP and multiple PHP versions
+
+# Server Initializtion and Hue Installation
+
+## Suggested Vultr Configuration
 
 * Optimized Cloud
 * Disable IPv6
@@ -10,9 +29,9 @@
   * Drop any (all ports) 
 * Enable backups
 
-# Server Initialization
+## Server Initialization
 
-## Initial Configuration
+### Initial Configuration
 
 Remove the default non-root user:
 
@@ -35,7 +54,7 @@ Disable password authentication for SSH by editing /etc/ssh/sshd_config:
 PasswordAuthentication no
 ```
 
-## Nginx
+### Nginx
 
 ```
 # add-apt-repository ppa:ondrej/nginx
@@ -53,7 +72,7 @@ Remove the default site:
 # rm /etc/nginx/sites-enabled/default
 ```
 
-## MariaDB
+### MariaDB
 
 Install MariaDB and run configuration script. Root password can be stored in password manager (though not needed for access when logged in as root). Since the root user uses "unix_socket" plugin, setting a password may actually be unnecessary.
 
@@ -68,7 +87,7 @@ Remove test database and access to it? [Y/n] y
 Reload privilege tables now? [Y/n] y
 ```
 
-## PHP 8.0
+### PHP 8.0
 
 ```
 # add-apt-repository ppa:ondrej/php
@@ -96,17 +115,13 @@ Finally, you may wish to remove the default php-fpm pool if not needed. Hue will
 # rm /etc/php/8.0/fpm/pool.d/www.conf
 ```
 
-# Mail
+## Hue
 
-Mail is not supported by this configuration (but can be added). For outgoing emails (transactional, reports, etc), consider using ssmtp with a service like [Postmark](https://postmarkapp.com/) for ease of use and improved deliverability.
-
-# Hue
-
-## Introduction
+### Introduction
 
 Hue is a helper tool for user management based on this server configuration.
 
-## Installation
+### Installation
 
 1. Add /root/bin to path by appending the following to /root/.profile:
 
@@ -122,8 +137,12 @@ PATH="$HOME/bin:$PATH"
 # ln -s /root/hue/bin/* /root/bin
 ```
 
-# Optional
+## Optional
 
 * Install dart-sass to /usr/local/bin/sass
 * Install wp-cli to /usr/local/bin/wp
 * Install composer to /usr/local/bin/composer
+
+### Mail
+
+For outgoing emails (transactional, reports, etc), consider using ssmtp with a service like [Postmark](https://postmarkapp.com/) for ease of use and improved deliverability.
