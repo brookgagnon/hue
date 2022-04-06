@@ -64,6 +64,7 @@ PasswordAuthentication no
 # ufw allow http
 # ufw allow https
 # snap install --classic certbot
+# systemctl enable nginx
 ```
 
 Remove the default site:
