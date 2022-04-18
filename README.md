@@ -12,7 +12,7 @@ Hue is a minimal set of scripts for managing a [LEMP](https://lemp.io/) server o
 ## Possible Upcoming Functionality
 
 * Edit users, sites, and databases
-* Script to initialize server from fresh Ubuntu Server 20.02 install
+* Script to initialize server from fresh Ubuntu Server 20.04 install
 * Server configuration options such as [Postmark](https://postmarkapp.com/) via sSMTP and multiple PHP versions
 
 # Server Initializtion and Hue Installation
